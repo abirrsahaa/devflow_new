@@ -2,8 +2,10 @@
 
 import Question from '@/database/question.model';
 import { connectToDatabase } from '../mongoose';
-import { CreateQuestionParams } from './shared.types';
+import { CreateQuestionParams, EditQuestionParams } from './shared.types';
 import Tag from '@/database/tag.model';
+import User from '@/database/user.model';
+import { revalidatePath } from 'next/cache';
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
@@ -40,12 +42,63 @@ export async function createQuestion(params: CreateQuestionParams) {
       tagDocuments.push(existingTag._id);
     }
 
+    // inserting all the tags in the question document
+
+    // !! ok si it is traversing over the tag array and updating the tag field in question document with the tags !
+
     await Question.findByIdAndUpdate(question._id, {
       $push: { tags: { $each: tagDocuments } },
     });
 
     // create an interaction record for the user ask question action
+
+    // Increment author's reputation by +5 for creating a question
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
+
+    revalidatePath(path);
   } catch (error) {
     console.log('this error is in createQuestion', error);
+  }
+}
+
+// bhai simple sa fact hai algo likho
+// maine question ka form banaya hai
+// usse inputs lene hai
+// then usko sanitize karke onsubmit handler mai bhejna hai
+// on submit handler kya karega woh ak api call karega yeh question banane ke liye jo ki maine upar likhi hai so just call it with appropriate params
+export async function getAllQuestions() {
+  try {
+    connectToDatabase();
+    const questions = await Question.find({})
+      .populate({ path: 'tags', model: Tag })
+      .populate({ path: 'author', model: User })
+      .sort({ createdAt: -1 });
+    console.log('the questions are ', questions);
+
+    return questions;
+  } catch (error) {
+    console.log('this error was originated in getAllQuestions-> ', error);
+  }
+}
+
+export async function editQuestion(params: EditQuestionParams) {
+  try {
+    connectToDatabase();
+    const { questionId, title, content, path } = params;
+
+    const question = await Question.findById(questionId).populate('tags');
+
+    if (!question) {
+      throw new Error('Question not found');
+    }
+
+    question.title = title;
+    question.content = content;
+
+    await question.save();
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log('this error is in editQuestion ', error);
   }
 }

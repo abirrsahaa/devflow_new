@@ -20,8 +20,9 @@ import { Editor } from '@tinymce/tinymce-react';
 import { useTheme } from '@/context/ThemeProvider';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { createQuestion } from '@/lib/actions/question.action';
+import { createQuestion, editQuestion } from '@/lib/actions/question.action';
 import { Button } from '@/components/ui/button';
+import { usePathname, useRouter } from 'next/navigation';
 
 // lets try out first implement karte hai dekhte hai kya hota hai
 // lets figure out what is happening here
@@ -43,17 +44,32 @@ interface Props {
 // for editor
 
 const Questions = ({ type, mongoUserId, questionDetails }: Props) => {
+  const pathname = usePathname();
   const [isSubmitting, setisSubmitting] = useState(false);
   const { mode } = useTheme();
+  const router = useRouter();
   const editorRef = useRef(null);
+
+  // !! i am in doubt of the below lines so need to fugure out what these are about
+  const parsedQuestionDetails =
+    questionDetails && JSON.parse(questionDetails || '');
+
+  const groupedTags = parsedQuestionDetails?.tags.map((tag: any) => tag.name);
   const form = useForm<z.infer<typeof QuestionSchema>>({
     resolver: zodResolver(QuestionSchema),
     defaultValues: {
-      title: '',
-      explanation: '',
-      tags: [],
+      title: parsedQuestionDetails?.title || '',
+      explanation: parsedQuestionDetails?.content || '',
+      tags: groupedTags || [],
     },
   });
+
+  // simple si bat hai mujhe user chahiye
+  // uske liye mujhe uska clerk id chahiye jo ki mai auth se nikal lunga
+  // then mai db call karunga to get this user
+
+  // abhi db call maro with this user id
+  // this means i need to set up an action for the same which would be user.actions
 
   // lets focus on some functionalities which will bring things to live
 
@@ -61,15 +77,44 @@ const Questions = ({ type, mongoUserId, questionDetails }: Props) => {
   // how will it react for the two types of operation
   // one for the posting of answer and other for the editing of question already asked
 
+  // need to optimize this submit function more such that we can reuse it again and again
+
   const onSubmit = async (values: z.infer<typeof QuestionSchema>) => {
     // this is the main place where we will be getting the form data
     // and obviously this is the place where we will be doing the backend stuff
     // and the data handling part
+
+    // !!edit wala sachme samajhna hoga time lagakar
+
+    console.log(' i am fucking here ');
+
+    setisSubmitting(true);
+    console.log('the mongoid in submit is ->', mongoUserId);
     try {
-      console.log('i am here ', values);
-      await createQuestion({});
+      if (type === 'Edit') {
+        await editQuestion({
+          questionId: parsedQuestionDetails._id,
+          title: values.title,
+          content: values.explanation,
+          path: pathname,
+        });
+
+        router.push(`/question/${parsedQuestionDetails._id}`);
+      } else {
+        await createQuestion({
+          title: values.title,
+          content: values.explanation,
+          tags: values.tags,
+          author: JSON.parse(mongoUserId),
+          path: pathname,
+        });
+
+        router.push('/');
+      }
     } catch (error) {
       console.log('the error is in submitting the form', error);
+    } finally {
+      setisSubmitting(false);
     }
   };
 

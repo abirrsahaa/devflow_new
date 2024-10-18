@@ -5,6 +5,7 @@ import NoResult from '@/components/shared/NoResult';
 import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
 import { Button } from '@/components/ui/button';
 import { HomePageFilters } from '@/constants/filters';
+import { getAllQuestions } from '@/lib/actions/question.action';
 import Link from 'next/link';
 import React from 'react';
 
@@ -15,44 +16,9 @@ import React from 'react';
 
 // and then come down to build the question cards which will be rendered and clicked upon to get to the desired question page
 
-const questions = [
-  {
-    _id: '1',
-    title: 'Cascading Deletes in SQLAlchemy?',
-    tags: [
-      { _id: '1', name: 'python' },
-      { _id: '2', name: 'sql' },
-    ],
-    author: {
-      _id: '1',
-      name: 'John Doe',
-      picture: 'john-doe.jpg',
-    },
-    upvotes: 1500000,
-    views: 500552,
-    answers: [],
-    createdAt: new Date('2023-09-01T12:00:00.000Z'),
-  },
-  {
-    _id: '2',
-    title: 'How to center a div?',
-    tags: [
-      { _id: '3', name: 'css' },
-      { _id: '4', name: 'html' },
-    ],
-    author: {
-      _id: '2',
-      name: 'Jane Smith',
-      picture: 'jane-smith.jpg',
-    },
-    upvotes: 5,
-    views: 50,
-    answers: [],
-    createdAt: new Date('2021-09-02T10:30:00.000Z'),
-  },
-];
-
-const page = () => {
+const page = async () => {
+  const questions = await getAllQuestions();
+  console.log('all the questions received are --> ', questions);
   return (
     <>
       {/* first comes to the ask questions part which will be a div of h1 and a button */}
@@ -90,8 +56,8 @@ const page = () => {
 
       {/* now the main thing is to render the question cards which forms the basis of everything  */}
       <div className="mt-10 flex w-full flex-col gap-6">
-        {questions.length > 0 ? (
-          questions.map((question) => (
+        {questions?.length > 0 ? (
+          questions?.map((question) => (
             <QuestionCard
               key={question._id}
               _id={question._id}
