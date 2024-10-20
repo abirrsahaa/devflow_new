@@ -37,6 +37,9 @@ const LocalSearchbar = ({
         />
       )}
 
+      {/* !just for removing error  */}
+      {route}
+
       <Input
         type="text"
         placeholder={placeholder}

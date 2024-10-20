@@ -3,7 +3,7 @@ import React from 'react';
 import RenderTag from '../shared/RenderTag';
 import Metric from '../shared/Metric';
 import { formatAndDivideNumber, getTimestamp } from '@/lib/utils';
-import { SignedIn } from '@clerk/nextjs';
+// import { SignedIn } from '@clerk/nextjs';
 
 interface QuestionProps {
   _id: string;
@@ -36,7 +36,7 @@ const QuestionCard = ({
   answers,
   createdAt,
 }: QuestionProps) => {
-  const showActionButtons = clerkId && clerkId === author.clerkId;
+  // const showActionButtons = clerkId && clerkId === author.clerkId;
 
   return (
     <div className="card-wrapper rounded-[10px] p-9 sm:px-11">
@@ -51,6 +51,9 @@ const QuestionCard = ({
             </h3>
           </Link>
         </div>
+
+        {/* !just for removing error in deployment  */}
+        {clerkId}
 
         {/* <SignedIn>
           {showActionButtons && (
