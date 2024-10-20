@@ -18,6 +18,10 @@ import React from 'react';
 
 const page = async () => {
   const questions = await getAllQuestions();
+  if (!questions || questions.length === 0) {
+    console.log('No questions received');
+    return;
+  }
   console.log('all the questions received are --> ', questions);
   return (
     <>
