@@ -20,7 +20,6 @@ const page = async () => {
   const questions = await getAllQuestions();
   if (!questions || questions.length === 0) {
     console.log('No questions received');
-    return;
   }
   // console.log('all the questions received are --> ', questions);
   return (
@@ -60,7 +59,14 @@ const page = async () => {
 
       {/* now the main thing is to render the question cards which forms the basis of everything  */}
       <div className="mt-10 flex w-full flex-col gap-6">
-        {questions?.length > 0 ? (
+        {!questions || questions.length === 0 ? (
+          <NoResult
+            title="There’s no question to show"
+            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
+            link="/ask-question"
+            linkTitle="Ask a Question"
+          />
+        ) : (
           questions?.map((question) => (
             <QuestionCard
               key={question._id}
@@ -74,13 +80,6 @@ const page = async () => {
               createdAt={question.createdAt}
             />
           ))
-        ) : (
-          <NoResult
-            title="There’s no question to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the discussion. our query could be the next big thing others learn from. Get involved! 💡"
-            link="/ask-question"
-            linkTitle="Ask a Question"
-          />
         )}
       </div>
     </>
