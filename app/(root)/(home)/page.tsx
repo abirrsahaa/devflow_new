@@ -22,7 +22,7 @@ const page = async () => {
     console.log('No questions received');
     return;
   }
-  console.log('all the questions received are --> ', questions);
+  // console.log('all the questions received are --> ', questions);
   return (
     <>
       {/* first comes to the ask questions part which will be a div of h1 and a button */}

@@ -73,7 +73,7 @@ export async function getAllQuestions() {
       .populate({ path: 'tags', model: Tag })
       .populate({ path: 'author', model: User })
       .sort({ createdAt: -1 });
-    console.log('the questions are ', questions);
+    // console.log('the questions are ', questions);
 
     return questions;
   } catch (error) {
