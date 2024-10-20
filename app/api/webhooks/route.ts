@@ -3,8 +3,12 @@ import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { createUser, DeleteUser, UpdateUser } from '@/lib/actions/user.action';
 import { NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/mongoose';
 
 export async function POST(req: Request) {
+  console.log('i got called in post');
+
+  connectToDatabase();
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
   //   !!need to have this after deployment of the project
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
@@ -57,6 +61,8 @@ export async function POST(req: Request) {
   const eventType = evt.type;
   console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
   console.log('Webhook body:', body);
+
+  console.log('event --> ', eventType);
 
   if (eventType === 'user.created') {
     const { id, email_addresses, image_url, username, first_name, last_name } =
