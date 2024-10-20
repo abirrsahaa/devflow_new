@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-
+import { Editor as TinyMCEEditor } from 'tinymce';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -49,7 +49,8 @@ const Questions = ({ type, mongoUserId, questionDetails }: Props) => {
   const [isSubmitting, setisSubmitting] = useState(false);
   const { mode } = useTheme();
   const router = useRouter();
-  const editorRef = useRef(null);
+
+  const editorRef = useRef<TinyMCEEditor | null>(null);
 
   // !! i am in doubt of the below lines so need to fugure out what these are about
   const parsedQuestionDetails =
@@ -207,7 +208,6 @@ const Questions = ({ type, mongoUserId, questionDetails }: Props) => {
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   onInit={(evt, editor) => {
-                    // @ts-ignore
                     editorRef.current = editor;
                   }}
                   onBlur={field.onBlur}
