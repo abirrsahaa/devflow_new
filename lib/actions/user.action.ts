@@ -94,3 +94,19 @@ export async function DeleteUser(params: DeleteUserParams) {
     console.log('this error is in delete user ', error);
   }
 }
+// params: GetAllUsersParams
+export async function GetAllUsers() {
+  try {
+    connectToDatabase();
+    // idhar pagination bhi lagana hai
+    // const { page, pageSize, filter, searchQuery } = params;
+
+    const users = await User.find({}).sort({ joinedAt: -1 });
+
+    return { users };
+
+    // !dont we need to specify the type which the function will be sending??
+  } catch (error) {
+    console.log('this error was received in getqallusers --> ', error);
+  }
+}

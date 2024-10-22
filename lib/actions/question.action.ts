@@ -2,10 +2,15 @@
 
 import Question from '@/database/question.model';
 import { connectToDatabase } from '../mongoose';
-import { CreateQuestionParams, EditQuestionParams } from './shared.types';
+import {
+  CreateQuestionParams,
+  EditQuestionParams,
+  GetQuestionByIdParams,
+} from './shared.types';
 import Tag from '@/database/tag.model';
 import User from '@/database/user.model';
 import { revalidatePath } from 'next/cache';
+import Answer from '@/database/answer.model';
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
@@ -100,5 +105,28 @@ export async function editQuestion(params: EditQuestionParams) {
     revalidatePath(path);
   } catch (error) {
     console.log('this error is in editQuestion ', error);
+  }
+}
+
+export async function getQuestionById(params: GetQuestionByIdParams) {
+  try {
+    connectToDatabase();
+
+    const { questionId } = params;
+
+    const question = await Question.findById(questionId)
+      .populate({
+        path: 'author',
+        model: User,
+        select: '_id clerkId name picture',
+      })
+      .populate({ path: 'tags', model: Tag, select: '_id name' })
+      .populate({ path: 'answers', model: Answer });
+
+    if (!question) throw new Error('bhaisab iska toh nahi mila ');
+
+    return question;
+  } catch (error) {
+    console.log('this error has been founded in getQuestionbyId -> ', error);
   }
 }
