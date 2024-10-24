@@ -6,6 +6,7 @@ import {
   CreateQuestionParams,
   EditQuestionParams,
   GetQuestionByIdParams,
+  QuestionVoteParams,
 } from './shared.types';
 import Tag from '@/database/tag.model';
 import User from '@/database/user.model';
@@ -15,7 +16,7 @@ import Answer from '@/database/answer.model';
 export async function createQuestion(params: CreateQuestionParams) {
   try {
     // connect to database pehle uske bad baki cheeze dekhi jayegi
-    connectToDatabase();
+    await connectToDatabase();
     console.log(params);
 
     const { title, content, tags, author, path } = params;
@@ -73,7 +74,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 // on submit handler kya karega woh ak api call karega yeh question banane ke liye jo ki maine upar likhi hai so just call it with appropriate params
 export async function getAllQuestions() {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const questions = await Question.find({})
       .populate({ path: 'tags', model: Tag })
       .populate({ path: 'author', model: User })
@@ -88,7 +89,7 @@ export async function getAllQuestions() {
 
 export async function editQuestion(params: EditQuestionParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { questionId, title, content, path } = params;
 
     const question = await Question.findById(questionId).populate('tags');
@@ -110,7 +111,7 @@ export async function editQuestion(params: EditQuestionParams) {
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
 
     const { questionId } = params;
 
@@ -128,5 +129,89 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
     return question;
   } catch (error) {
     console.log('this error has been founded in getQuestionbyId -> ', error);
+  }
+}
+
+export async function upvoteQuestion(params: QuestionVoteParams) {
+  try {
+    await connectToDatabase();
+    // abhi karo jo bhi lauda lasan hai
+
+    const { questionId, userId, hasdownVoted, hasupVoted, path } = params;
+
+    // pehle get the question kyu ki usi ko manipulate karna hai
+
+    let updateQuery = {};
+    // akbar mil jaye question then check karo
+    // agar hasupvoted hai toh phir usko hatao
+    // and nahi hai toh usko true karo by pushing it to upvotes kya push karna hai ? --> userID
+
+    // agar upvited hai toh userid ko nikalo upvotes se
+    // aur agar downvoted hai toh downvote se nikalo and upvote mai dalo
+    if (hasupVoted) {
+      updateQuery = { $pull: { upvotes: userId } };
+    } else if (hasdownVoted) {
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { upvotes: userId } };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    // aur agar dono nahi hai toh upvotes mai dalo au
+    if (!question) {
+      throw new Error('Question not found');
+    }
+
+    // Increment author's reputation
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log('this error is found in upvoteQuestion -> ', error);
+  }
+}
+
+export async function downvoteQuestion(params: QuestionVoteParams) {
+  try {
+    await connectToDatabase();
+
+    const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    console.log('the params are -> ', params);
+
+    let updateQuery = {};
+
+    if (hasdownVoted) {
+      updateQuery = { $pull: { downvotes: userId } };
+    } else if (hasupVoted) {
+      updateQuery = {
+        $pull: { upvotes: userId },
+        $push: { downvotes: userId },
+      };
+    } else {
+      updateQuery = { $addToSet: { downvotes: userId } };
+    }
+
+    const question = await Question.findByIdAndUpdate(questionId, updateQuery, {
+      new: true,
+    });
+
+    if (!question) {
+      throw new Error('Question not found');
+    }
+
+    // Increment author's reputation
+
+    revalidatePath(path);
+
+    return { question };
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 }

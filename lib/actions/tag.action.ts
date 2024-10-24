@@ -7,7 +7,7 @@ import Tag from '@/database/tag.model';
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
 
     const { userId } = params;
 
@@ -30,7 +30,7 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 
 export async function GetAllTags() {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const tags = await Tag.find({}).sort({ createdOn: -1 });
 
     return { tags };
