@@ -4,7 +4,7 @@ import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
 import { TagFilters } from '@/constants/filters';
 import { GetAllTags } from '@/lib/actions/tag.action';
 import Link from 'next/link';
-
+export const runtime = 'edge';
 const page = async () => {
   // const result = await GetAllUsers();
   const result = await GetAllTags();

@@ -5,6 +5,7 @@ import { WebhookEvent } from '@clerk/nextjs/server';
 
 import { NextResponse } from 'next/server';
 import { createUser, DeleteUser, UpdateUser } from '@/lib/actions/user.action';
+export const runtime = 'edge';
 
 export async function POST(req: Request) {
   console.log('i am here in post request ');

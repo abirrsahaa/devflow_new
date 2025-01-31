@@ -5,7 +5,7 @@ import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
 import { QuestionFilters } from '@/constants/filters';
 import { getSavedQuestions } from '@/lib/actions/user.action';
 import { auth } from '@clerk/nextjs/server';
-
+export const runtime = 'edge';
 export default async function Home() {
   const { userId } = auth();
 

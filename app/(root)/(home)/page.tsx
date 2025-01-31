@@ -15,7 +15,7 @@ import React from 'react';
 // and select menu for filters in small to extra small devices
 
 // and then come down to build the question cards which will be rendered and clicked upon to get to the desired question page
-
+export const runtime = 'edge';
 const page = async () => {
   const questions = await getAllQuestions();
   if (!questions || questions.length === 0) {
