@@ -11,7 +11,7 @@ import AllAnswers from '@/components/shared/AllAnswer';
 import { getUserById } from '@/lib/actions/user.action';
 import { auth } from '@clerk/nextjs/server';
 import Vote from '@/components/shared/Vote';
-export const runtime = 'edge';
+
 const Page = async ({ params }) => {
   console.log(params);
 

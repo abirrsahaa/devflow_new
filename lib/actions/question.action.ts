@@ -81,6 +81,8 @@ export async function getAllQuestions() {
       .sort({ createdAt: -1 });
     // console.log('the questions are ', questions);
 
+    console.log('the questions are -> ', questions);
+
     return questions;
   } catch (error) {
     console.log('this error was originated in getAllQuestions-> ', error);

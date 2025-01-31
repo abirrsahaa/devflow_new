@@ -5,7 +5,7 @@ import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
 import { UserFilters } from '@/constants/filters';
 import { GetAllUsers } from '@/lib/actions/user.action';
 import Link from 'next/link';
-export const runtime = 'edge';
+
 
 const page = async () => {
   const result = await GetAllUsers();
