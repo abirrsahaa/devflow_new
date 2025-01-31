@@ -2,7 +2,7 @@ import { IUser } from '@/database/user.model';
 import { Schema } from 'mongoose';
 
 export interface CreateAnswerParams {
-  content: string;
+  content: string | undefined;
   author: string; // User ID
   question: string; // Question ID
   path: string;
