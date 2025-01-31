@@ -106,6 +106,8 @@ const Answer = ({ question, questionId, authorId }: Props) => {
                     onBlur={field.onBlur}
                     onEditorChange={(content) => field.onChange(content)}
                     init={{
+                      valid_elements: '*[*]',
+                      valid_domains: ['*'],
                       height: 350,
                       menubar: false,
                       plugins: [
